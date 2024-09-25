@@ -1,6 +1,7 @@
 package com.lc;
 
 import com.lc.es.ESConfig;
+import com.lc.es.ElasticsearchUtils;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetIndexRequest;
@@ -19,6 +20,17 @@ public class SpringBootMain {
 
     @PostConstruct
     public void Test() throws IOException {
+         testElasticsearchUtils();
+    }
+
+    public void testElasticsearchUtils() throws IOException {
+        ElasticsearchUtils elastic = new ElasticsearchUtils("192.168.66.175:19201,192.168.66.176:19201,192.168.66.177:19201", "elastic", "123456");
+        RestHighLevelClient client = elastic.getClient();
+        GetIndexResponse test = client.indices().get(new GetIndexRequest("test"), RequestOptions.DEFAULT);
+        System.out.println(test);
+    }
+
+    public void testConfig() throws IOException {
         ESConfig esConfig = new ESConfig();
         RestHighLevelClient restHighLevelClient = esConfig.getRestHighLevelClient();
         System.out.println(restHighLevelClient);
