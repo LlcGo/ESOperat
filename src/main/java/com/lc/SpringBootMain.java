@@ -1,5 +1,6 @@
 package com.lc;
 
+import com.alibaba.fastjson.JSONObject;
 import com.lc.es.ESConfig;
 import com.lc.es.ElasticsearchUtils;
 import org.elasticsearch.client.RequestOptions;
@@ -20,7 +21,21 @@ public class SpringBootMain {
 
     @PostConstruct
     public void Test() throws IOException {
-         testElasticsearchUtils();
+//        testGetIndex();
+        testMapping();
+    }
+
+    public void testMapping(){
+        ElasticsearchUtils elastic = new ElasticsearchUtils("192.168.66.175:19201,192.168.66.176:19201,192.168.66.177:19201", "elastic", "123456");
+        JSONObject test = elastic.getMapping("test");
+        JSONObject jsonObject = test.getJSONObject("properties");
+        System.out.println(jsonObject);
+    }
+
+    public void testGetIndex(){
+        ElasticsearchUtils elasticsearchUtils = new ElasticsearchUtils("192.168.66.175:19201,192.168.66.176:19201,192.168.66.177:19201", "elastic", "123456");
+        GetIndexResponse test = elasticsearchUtils.getIndex("test");
+        System.out.println(test);
     }
 
     public void testElasticsearchUtils() throws IOException {

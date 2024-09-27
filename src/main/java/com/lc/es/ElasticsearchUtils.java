@@ -1,9 +1,17 @@
 package com.lc.es;
 
+import com.alibaba.fastjson.JSONObject;
+import org.apache.http.util.EntityUtils;
+import org.elasticsearch.client.Request;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.client.indices.GetIndexResponse;
 import org.elasticsearch.common.time.DateUtils;
 import org.junit.platform.commons.util.StringUtils;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -56,6 +64,36 @@ public class ElasticsearchUtils {
         return client;
     }
 
+    /**
+     * 获取索引信息
+     * @param index
+     */
+    public GetIndexResponse getIndex(String index){
+        GetIndexRequest getIndexRequest = new GetIndexRequest(index);
+        try {
+            return getClient().indices().get(getIndexRequest, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            printException(e);
+        }
+        return null;
+    }
+
+    public JSONObject getMapping(String index){
+        Response response;
+        try {
+            Request request = new Request("get", "/" + index + "/_mappings");
+            response = getClient().getLowLevelClient().performRequest(request);
+            String responseBody = EntityUtils.toString(response.getEntity());
+            JSONObject responseBodyJson = JSONObject.parseObject(responseBody);
+            JSONObject responseBodyIndexJson = responseBodyJson.getJSONObject(index);
+            return responseBodyIndexJson.getJSONObject("mappings");
+        } catch (IOException e) {
+            printException(e);
+        }
+        return null;
+    }
+
+
     private void slowLog(Object content){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         System.out.println(simpleDateFormat.format(new Date()) + "=>" + content);
@@ -79,5 +117,7 @@ public class ElasticsearchUtils {
             }
         }
     }
+
+
 
 }
