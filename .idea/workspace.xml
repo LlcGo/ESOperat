@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d2012a1c-ced8-48d1-8b77-3cdbbcc5cf69" name="Changes" comment="ESUtils">
+    <list default="true" id="d2012a1c-ced8-48d1-8b77-3cdbbcc5cf69" name="Changes" comment="testMapping">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/lc/es/bean/Field.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/lc/SpringBootMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/lc/SpringBootMain.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/lc/es/ElasticsearchUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/lc/es/ElasticsearchUtils.java" afterDir="false" />
     </list>
@@ -93,7 +93,10 @@
       <workItem from="1727280285821" duration="63000" />
       <workItem from="1727358380196" duration="22000" />
       <workItem from="1727360826810" duration="1734000" />
-      <workItem from="1727448010432" duration="3517000" />
+      <workItem from="1727448010432" duration="3543000" />
+      <workItem from="1727508224883" duration="1293000" />
+      <workItem from="1728399090929" duration="1642000" />
+      <workItem from="1728481748345" duration="1452000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <created>1727190256741</created>
@@ -116,7 +119,14 @@
       <option name="project" value="LOCAL" />
       <updated>1727280322825</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="testMapping">
+      <created>1727453765729</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1727453765729</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -126,14 +136,15 @@
     <MESSAGE value="init" />
     <MESSAGE value="ESTest" />
     <MESSAGE value="ESUtils" />
-    <option name="LAST_COMMIT_MESSAGE" value="ESUtils" />
+    <MESSAGE value="testMapping" />
+    <option name="LAST_COMMIT_MESSAGE" value="testMapping" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/lc/SpringBootMain.java</url>
-          <line>36</line>
+          <line>56</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -158,8 +169,18 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/lc/SpringBootMain.java</url>
-          <line>28</line>
-          <option name="timeStamp" value="9" />
+          <line>38</line>
+          <option name="timeStamp" value="11" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/lc/es/ElasticsearchUtils.java</url>
+          <line>124</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/lc/es/ElasticsearchUtils.java</url>
+          <line>156</line>
+          <option name="timeStamp" value="14" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

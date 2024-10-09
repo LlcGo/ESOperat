@@ -3,6 +3,7 @@ package com.lc;
 import com.alibaba.fastjson.JSONObject;
 import com.lc.es.ESConfig;
 import com.lc.es.ElasticsearchUtils;
+import com.lc.es.bean.Field;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetIndexRequest;
@@ -12,6 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.List;
 
 @SpringBootApplication
 public class SpringBootMain {
@@ -19,10 +21,28 @@ public class SpringBootMain {
         SpringApplication.run(SpringBootMain.class,args);
     }
 
+    static ElasticsearchUtils elasticsearchUtils;
+    static {
+        elasticsearchUtils = new ElasticsearchUtils("192.168.66.178:19201,192.168.66.179:19201,192.168.66.180:19201", "elastic", "123456");
+    }
+
     @PostConstruct
     public void Test() throws IOException {
 //        testGetIndex();
-        testMapping();
+//        testMapping();
+//        testGetMappingFields();
+        testGetFields();
+    }
+
+    public void testGetFields(){
+        List<Field> test = elasticsearchUtils.getFields("test");
+        System.out.println(test);
+    }
+
+
+    public static void testGetMappingFields(){
+        JSONObject test = elasticsearchUtils.getMappingFields("test");
+        System.out.println(test);
     }
 
     public void testMapping(){

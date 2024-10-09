@@ -1,6 +1,8 @@
 package com.lc.es;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.lc.es.bean.Field;
 import org.apache.http.util.EntityUtils;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RequestOptions;
@@ -13,7 +15,9 @@ import org.junit.platform.commons.util.StringUtils;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class ElasticsearchUtils {
     private RestHighLevelClient client;
@@ -91,6 +95,66 @@ public class ElasticsearchUtils {
             printException(e);
         }
         return null;
+    }
+
+    public JSONObject getMappingFields(String index){
+        JSONObject mapping = getMapping(index);
+        if (mapping != null){
+            return mapping.getJSONObject("properties");
+        }
+        return null;
+    }
+
+
+    public List<Field> getFields(String index){
+        List<Field> cols = new ArrayList<>();
+        JSONObject json = getMappingFields(index);
+        if (json != null){
+            return getFields(json);
+        }
+        return cols;
+    }
+
+    public List<Field> getFields(JSONObject json){
+        List<Field> clos = new ArrayList<>();
+        if (json != null){
+            for (String key : json.keySet()) {
+                Field col = new Field();
+                col.setName(key);
+
+                JSONObject cjson = json.getJSONObject(key);
+                if (cjson.containsKey("type")){
+                    col.setType(cjson.getString("type"));
+                }
+
+                if (cjson.containsKey("format")){
+                    col.setFormat(cjson.getString("format"));
+                }
+
+                if(cjson.containsKey("index")){
+                    col.setIndex(cjson.getString("index"));
+                }
+
+                if (cjson.containsKey("store")){
+                    col.setStore(cjson.getString("store"));
+                }
+
+                if(cjson.containsKey("analyzer")){
+                    col.setAnalyzer(cjson.getString("analyzer"));
+                }
+
+                if (cjson.containsKey("properties")){
+                    col.setProperties(getFields(cjson.getJSONObject("properties")));
+                }
+
+                if (cjson.containsKey("fields")){
+                    col.setFields(getFields(cjson.getJSONObject("fields")));
+                }
+
+                clos.add(col);
+            }
+        }
+        return clos;
     }
 
 
