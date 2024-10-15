@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d2012a1c-ced8-48d1-8b77-3cdbbcc5cf69" name="Changes" comment="testMapping">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/lc/es/bean/Field.java" afterDir="false" />
+    <list default="true" id="d2012a1c-ced8-48d1-8b77-3cdbbcc5cf69" name="Changes" comment="testGetField">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/lc/es/bean/QueryBean.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/lc/SpringBootMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/lc/SpringBootMain.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/lc/es/ElasticsearchUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/lc/es/ElasticsearchUtils.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -96,7 +95,11 @@
       <workItem from="1727448010432" duration="3543000" />
       <workItem from="1727508224883" duration="1293000" />
       <workItem from="1728399090929" duration="1642000" />
-      <workItem from="1728481748345" duration="1452000" />
+      <workItem from="1728481748345" duration="2196000" />
+      <workItem from="1728566727408" duration="603000" />
+      <workItem from="1728570543488" duration="887000" />
+      <workItem from="1728653329734" duration="32000" />
+      <workItem from="1728998918018" duration="2808000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <created>1727190256741</created>
@@ -126,7 +129,14 @@
       <option name="project" value="LOCAL" />
       <updated>1727453765729</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="testGetField">
+      <created>1728483211355</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1728483211355</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -137,7 +147,8 @@
     <MESSAGE value="ESTest" />
     <MESSAGE value="ESUtils" />
     <MESSAGE value="testMapping" />
-    <option name="LAST_COMMIT_MESSAGE" value="testMapping" />
+    <MESSAGE value="testGetField" />
+    <option name="LAST_COMMIT_MESSAGE" value="testGetField" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -157,6 +157,10 @@ public class ElasticsearchUtils {
         return clos;
     }
 
+    public List<JSONObject> searchDocs(String index){
+        return null;
+    };
+
 
     private void slowLog(Object content){
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
