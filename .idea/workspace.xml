@@ -4,10 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d2012a1c-ced8-48d1-8b77-3cdbbcc5cf69" name="Changes" comment="testGetField">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/lc/es/bean/QueryBean.java" afterDir="false" />
+    <list default="true" id="d2012a1c-ced8-48d1-8b77-3cdbbcc5cf69" name="Changes" comment="QueryBean">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/lc/es/bean/EsRangeType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/lc/es/bean/Value.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/lc/es/ElasticsearchUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/lc/es/ElasticsearchUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lc/es/bean/QueryBean.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/lc/es/bean/QueryBean.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,6 +18,7 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="Enum" />
         <option value="Class" />
       </list>
     </option>
@@ -99,7 +101,8 @@
       <workItem from="1728566727408" duration="603000" />
       <workItem from="1728570543488" duration="887000" />
       <workItem from="1728653329734" duration="32000" />
-      <workItem from="1728998918018" duration="2808000" />
+      <workItem from="1728998918018" duration="3392000" />
+      <workItem from="1729086400649" duration="799000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <created>1727190256741</created>
@@ -136,7 +139,14 @@
       <option name="project" value="LOCAL" />
       <updated>1728483211355</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="QueryBean">
+      <created>1729001740234</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1729001740234</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -148,7 +158,8 @@
     <MESSAGE value="ESUtils" />
     <MESSAGE value="testMapping" />
     <MESSAGE value="testGetField" />
-    <option name="LAST_COMMIT_MESSAGE" value="testGetField" />
+    <MESSAGE value="QueryBean" />
+    <option name="LAST_COMMIT_MESSAGE" value="QueryBean" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

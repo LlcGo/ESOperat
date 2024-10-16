@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 
 import java.io.Serializable;
 import java.util.List;
@@ -244,5 +245,37 @@ public class QueryBean implements Serializable {
             }
             boolQueryBuilder.must(andBoolQuery);
         }
+
+        if(getRangeFields() != null && getRangeFields().size() > 0){
+            for (Object [] obj : getRangeFields()){
+                RangeQueryBuilder range = QueryBuilders.rangeQuery(obj[0].toString());
+                EsRangeType op = (EsRangeType)obj[1];
+
+                Object value = obj[2];
+                Float boost = null;
+                if(value instanceof  Value){
+                    boost = ((Value)value).getBoost();
+                    value = ((Value)value).getValue();
+                }
+
+                if (EsRangeType.op_gt == op){
+                    range.gt(value);
+                }else if (EsRangeType.op_gte == op){
+                    range.gte(value);
+                }else if (EsRangeType.op_lt == op){
+                    range.lt(value);
+                }else if (EsRangeType.op_lte == op){
+                    range.lte(value);
+                }
+
+                if (boost != null){
+                    range.boost(boost);
+                }
+
+                boolQueryBuilder.must(range);
+            }
+        }
+
+
     }
 }
