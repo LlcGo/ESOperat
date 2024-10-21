@@ -1,12 +1,12 @@
 package com.lc.es.bean;
 
 import com.alibaba.fastjson.JSONObject;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.common.recycler.Recycler;
+import org.elasticsearch.index.query.*;
+import org.elasticsearch.script.Script;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 
 public class QueryBean implements Serializable {
@@ -276,6 +276,100 @@ public class QueryBean implements Serializable {
             }
         }
 
+        // 字段比较
+        if(getCompareFields() != null && getCompareFields().size() > 0){
+            for (String[] obj : getCompareFields()) {
+                String idOrCode = "doc['" + obj[0] + "'].value.compareTo(doc['" + obj[2] +"'].value)" + obj[1] + "0";
+                Script script = new Script(idOrCode);
+                ScriptQueryBuilder scriptQueryBuilder = QueryBuilders.scriptQuery(script);
 
+                boolQueryBuilder.must(QueryBuilders.existsQuery(obj[0]));
+                boolQueryBuilder.must(QueryBuilders.existsQuery(obj[2]));
+                boolQueryBuilder.must(scriptQueryBuilder);
+            }
+        }
+
+        // 自定义脚本
+        if (getScripts() != null && getScripts().size() > 0){
+            for (String idOrCode : getScripts()) {
+                Script script = new Script(idOrCode);
+                ScriptQueryBuilder scriptQueryBuilder = QueryBuilders.scriptQuery(script);
+                boolQueryBuilder.must(scriptQueryBuilder);
+            }
+        }
+        if (getExistsFields() != null){
+            for (String field : getExistsFields().split(",")) {
+                ExistsQueryBuilder existsQueryBuilder = QueryBuilders.existsQuery(field);
+                boolQueryBuilder.must(existsQueryBuilder);
+            }
+        }
+
+        // 自定义字段
+        if (getTermJson() != null){
+            for (String key : getTermJson().keySet()) {
+                Object value = getTermJson().get(key);
+                QueryBuilder qb = null;
+                Float boost = null;
+                if (value instanceof Value){
+                    boost = ((Value)value).getBoost();
+                    value = ((Value)value).getValue();
+                }
+
+                if (value instanceof Collection){
+                    qb = QueryBuilders.termsQuery(key,(Collection<?>) value);
+                }else if (value instanceof Object[]){
+                    qb = QueryBuilders.termsQuery(key,(Object[]) value);
+                }else {
+                    qb = QueryBuilders.termQuery(key,value);
+                }
+
+                if (boost != null){
+                    qb.boost(boost);
+                }
+
+                boolQueryBuilder.must(qb);
+            }
+        }
+
+        // 模糊搜索字段
+        if (getWildcardJson() != null){
+            for (String key : getWildcardJson().keySet()) {
+                Object value = getWildcardJson().get(key);
+                Float boost = null;
+                if (value instanceof Value){
+                    boost = ((Value)value).getBoost();
+                    value = ((Value)value).getValue();
+                }
+                QueryBuilder qb = QueryBuilders.wildcardQuery(key,value.toString());
+                if (boost != null){
+                    qb.boost(boost);
+                }
+
+                boolQueryBuilder.must(qb);
+            }
+        }
+
+        // 分词字段
+        if (getMultiMatchJson() != null){
+            for (String fields : getMultiMatchJson().keySet()) {
+                Object value = getMultiMatchJson().get(fields);
+                Float boost = null;
+                String analyzer = null;
+                if (value instanceof Value){
+                    boost =((Value)value).getBoost();
+                    analyzer = ((Value)value).getAnalyzer();
+                    value = ((Value)value).getValue();
+                }
+                MultiMatchQueryBuilder qb = QueryBuilders.multiMatchQuery(value, fields);
+                if (analyzer != null){
+                    qb.analyzer(analyzer);
+                }
+                if (boost != null){
+                    qb.boost(boost);
+                }
+                boolQueryBuilder.must(qb);
+            }
+        }
+        return boolQueryBuilder;
     }
 }
