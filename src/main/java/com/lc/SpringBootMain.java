@@ -44,6 +44,8 @@ public class SpringBootMain {
         // List<JSONObject> test = elasticsearchUtils.searchDocs("test",relationParam);
         Map<String, String> fieldMap = getFieldMap("field_keyword");
         System.out.println(fieldMap);
+        List<String> indices = elasticsearchUtils.getIndices();
+        System.out.println(indices);
     }
 
     public void testGetFields(){

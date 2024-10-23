@@ -1,6 +1,7 @@
 package com.lc.es;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.lc.es.bean.Field;
 import com.lc.es.bean.QueryBean;
@@ -88,6 +89,23 @@ public class ElasticsearchUtils {
             printException(e);
         }
         return null;
+    }
+
+    public List<String> getIndices(){
+        Response response;
+        try{
+            Request request = new Request("get", "/_cat/indices?v&h=index&format=json");
+            response = getClient().getLowLevelClient().performRequest(request);
+            JSONArray index = JSONObject.parseArray(EntityUtils.toString(response.getEntity()));
+            ArrayList<String> strings = new ArrayList<>();
+            for (int i = 0; i < index.size(); i++) {
+                strings.add(index.getJSONObject(i).getString("index"));
+            }
+            return strings;
+        }catch (Exception e){
+            printException(e);
+            return null;
+        }
     }
 
     public JSONObject getMapping(String index){
