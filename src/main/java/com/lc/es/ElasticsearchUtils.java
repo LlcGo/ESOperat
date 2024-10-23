@@ -3,7 +3,12 @@ package com.lc.es;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.lc.es.bean.Field;
+import com.lc.es.bean.QueryBean;
 import org.apache.http.util.EntityUtils;
+import org.elasticsearch.action.ActionRequest;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.Response;
@@ -11,13 +16,16 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.client.indices.GetIndexResponse;
 import org.elasticsearch.common.time.DateUtils;
+import org.elasticsearch.core.TimeValue;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.junit.platform.commons.util.StringUtils;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class ElasticsearchUtils {
     private RestHighLevelClient client;
@@ -157,9 +165,148 @@ public class ElasticsearchUtils {
         return clos;
     }
 
-    public List<JSONObject> searchDocs(String index){
+    public List<JSONObject> searchDocs(String index, QueryBean query){
+        if (query == null){
+            query = new QueryBean();
+        }
+
+        SearchResponse searchResponse = searchDocsResponse(index, query);
+        if (searchResponse != null && searchResponse.status().getStatus() == 200){
+            long totalHits = searchResponse.getHits().getTotalHits().value;
+            long length = searchResponse.getHits().getHits().length;
+
+            slowLog(index," search:" + length + "/" + totalHits);
+            return setSearchResponse(searchResponse,index,query.getIncludes());
+        }
         return null;
-    };
+    }
+
+    private List<JSONObject> setSearchResponse(SearchResponse searchResponse, String index, String fields) {
+        boolean mulit = false;
+        if (index.contains(",") || index.contains("*")){
+            mulit = true;
+        }
+        List<JSONObject> sourceList = new ArrayList<>();
+        for (SearchHit searchHit : searchResponse.getHits().getHits()) {
+            searchHit.getSourceAsMap().put(_id,searchHit.getId());
+            JSONObject record = JSONObject.parseObject(JSON.toJSONString(searchHit.getSourceAsMap()));
+            if (mulit){
+                record.put("_index",searchHit.getIndex());
+            }
+            sourceList.add(dealJson(record, fields));
+        }
+
+        return sourceList;
+    }
+
+    private JSONObject dealJson(JSONObject data, String fields) {
+        if (data != null && StringUtils.isNotBlank(fields)){
+           Map<String,String> map =  getFieldMap(fields);
+            for (String field : map.keySet()) {
+                String nname = map.get(field);
+                data.put(nname,data.get(field));
+                data.remove(field);
+            }
+        }
+        return null;
+    }
+
+    public static Map<String, String> getFieldMap(String fields) {
+        HashMap<String, String> map = new HashMap<>();
+        String[] fieldArr = fields.split(",");
+        for (int i = 0; i <fieldArr.length; i++) {
+            String field =fieldArr[i];
+            field = field.trim();
+            if (field.indexOf(" ") != -1){
+                String nname = field.split("\\s+")[1].trim();
+                field = fields.split("\\s+")[0].trim();
+                map.put(field,nname);
+            }
+        }
+        return map;
+    }
+
+    private SearchResponse searchDocsResponse(String index,QueryBean query){
+        return searchDocsponse(index,query,null);
+    }
+
+    private SearchResponse searchDocsponse(String index, QueryBean query, Long timeValueMinutes) {
+         if (query == null){
+             query = new QueryBean();
+         }
+        SearchRequest searchRequest = new SearchRequest(index.split(","));;
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(query.getQueryBuilder());
+
+        if (StringUtils.isNotBlank(query.getIncludes()) || StringUtils.isNotBlank(query.getExcludes())){
+            searchSourceBuilder.fetchSource(getFieldNameArr(query.getIncludes()),getFieldNameArr(query.getExistsFields()));
+            searchSourceBuilder.fetchSource(true);
+        }
+
+        if (StringUtils.isNotBlank(query.getOrderBy())){
+            String[] sortFieldArr = query.getOrderBy().split(",");
+            for (String sort : sortFieldArr) {
+                SortOrder order = SortOrder.ASC;
+                sort = sort.trim();
+
+                if (sort.indexOf(" ") != -1){
+                    String orderType = sort.split("\\s+")[1].trim();
+                    sort = sort.split("\\s+")[0].trim();
+                    if ("desc".equalsIgnoreCase(orderType)){
+                        order = SortOrder.DESC;
+                    }
+                }
+                searchSourceBuilder.sort(sort,order);
+            }
+        }
+
+        if (query.getPageSize() != null && query.getPageSize() > 0){
+            // 分页
+            if (query.getPageIndex() != null && query.getPageIndex() > 0){
+                searchSourceBuilder.from((query.getPageIndex() -1) * query.getPageSize());
+            }
+            searchSourceBuilder.size(query.getPageSize());
+        }
+
+        long startTime = System.currentTimeMillis();
+        SearchResponse searchResponse = null;
+        try {
+            searchSourceBuilder.trackTotalHits(true);
+            searchRequest.source(searchSourceBuilder);
+            searchRequest.searchType(SearchType.DEFAULT);
+            if (timeValueMinutes != null){
+                searchRequest.scroll(TimeValue.timeValueMinutes(timeValueMinutes));
+            }
+            searchResponse = getClient().search(searchRequest,RequestOptions.DEFAULT);
+        }catch (Exception e){
+            printException(e);
+        }
+        slowLog(index,searchRequest,startTime);
+        return searchResponse;
+    }
+
+    /**
+     * 获取字段信息
+     *
+     * @param fields
+     * @return
+     */
+    private String[] getFieldNameArr(String fields) {
+        if (StringUtils.isBlank(fields)){
+            return null;
+        }
+        String[] fieldArr = fields.split(",");
+        String[] reArr = new String[fieldArr.length];
+        for (int i = 0; i < fieldArr.length; i++) {
+            String field = fieldArr[i];
+            field = field.trim();
+            if (field.indexOf(" ") != -1){
+                field = fields.split("\\s+")[0].trim();
+            }
+            reArr[i] = field;
+        }
+        return reArr;
+    }
 
 
     private void slowLog(Object content){
@@ -174,6 +321,14 @@ public class ElasticsearchUtils {
         }
         buffer.append("      " + content);
         slowLog(buffer.toString());
+    }
+
+    private void slowLog(String index, ActionRequest request, long startTime) {
+        long endTime = System.currentTimeMillis();
+        float excTime = (float) (endTime - startTime) / 1000;
+        if (excTime >= slowTime) {
+            slowLog(index, "es执行时间：" + excTime + "s    " + request);
+        }
     }
 
     private void printException(Exception e){

@@ -4,8 +4,10 @@ import com.alibaba.fastjson.JSONObject;
 import org.elasticsearch.common.recycler.Recycler;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.script.Script;
+import org.elasticsearch.search.aggregations.metrics.TopHits;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -371,5 +373,38 @@ public class QueryBean implements Serializable {
             }
         }
         return boolQueryBuilder;
+    }
+
+    public void putTermField(String field,Object value){
+        if (termJson == null){
+            termJson = new JSONObject();
+        }
+        termJson.put(field,value);
+    }
+
+    public void putAndTermField(String field,Object value){
+        QueryBean andReq = new QueryBean();
+        andReq.putTermField(field,value);
+        putAndQueryBean(andReq);
+    }
+
+    public void putAndQueryBean(QueryBean andQueryBean) {
+        if (this.andQueryBeans == null){
+            this.andQueryBeans = new ArrayList<>();
+        }
+        this.andQueryBeans.add(andQueryBean);
+    }
+
+    public void putOrQueryBean(QueryBean orQueryBean){
+        if (this.orQueryBeans == null){
+            this.orQueryBeans = new ArrayList<>();
+        }
+        this.orQueryBeans.add(orQueryBean);
+    }
+
+    public void putOrTermField(String field,Object value){
+        QueryBean orReq = new QueryBean();
+        orReq.putTermField(field,value);
+        putOrQueryBean(orReq);
     }
 }
