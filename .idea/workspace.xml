@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="d2012a1c-ced8-48d1-8b77-3cdbbcc5cf69" name="Changes" comment="QueryBean">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/lc/SpringBootMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/lc/SpringBootMain.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/lc/es/ElasticsearchUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/lc/es/ElasticsearchUtils.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -104,6 +103,8 @@
       <workItem from="1729086400649" duration="883000" />
       <workItem from="1729518512803" duration="5120000" />
       <workItem from="1729605180528" duration="5880000" />
+      <workItem from="1729692635616" duration="40000" />
+      <workItem from="1729693400146" duration="1327000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <created>1727190256741</created>
@@ -168,7 +169,14 @@
       <option name="project" value="LOCAL" />
       <updated>1729690498452</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="QueryBean">
+      <created>1729692648074</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1729692648074</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -218,12 +226,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/lc/es/ElasticsearchUtils.java</url>
-          <line>150</line>
+          <line>154</line>
           <option name="timeStamp" value="13" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/lc/es/ElasticsearchUtils.java</url>
-          <line>182</line>
+          <line>186</line>
           <option name="timeStamp" value="14" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">

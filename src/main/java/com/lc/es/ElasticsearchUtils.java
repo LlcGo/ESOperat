@@ -7,9 +7,8 @@ import com.lc.es.bean.Field;
 import com.lc.es.bean.QueryBean;
 import org.apache.http.util.EntityUtils;
 import org.elasticsearch.action.ActionRequest;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.action.search.*;
+import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.Response;
@@ -18,15 +17,20 @@ import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.client.indices.GetIndexResponse;
 import org.elasticsearch.common.time.DateUtils;
 import org.elasticsearch.core.TimeValue;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.junit.platform.commons.util.StringUtils;
+import org.omg.CORBA.PUBLIC_MEMBER;
+import org.springframework.util.CollectionUtils;
 
 import javax.swing.*;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ElasticsearchUtils {
     private RestHighLevelClient client;
@@ -216,6 +220,62 @@ public class ElasticsearchUtils {
 
         return sourceList;
     }
+
+    public <T> List<T> queryEsData(String index, Class<T> clazz, LocalDateTime st,LocalDateTime ed,Set<String> indexList) throws IOException {
+        String[] indices = {"test","test01"};
+        // 若索引不存在直接返回
+        int notExistCount = 0;
+        for (String str : indices) {
+            str = str.replace("*","");
+            if (!indexList.contains(str)){
+                notExistCount++;
+            }
+        }
+        if (notExistCount ==indices.length){
+            return null;
+        }
+
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(QueryBuilders.boolQuery().must(QueryBuilders.rangeQuery("absTime")
+                .gte(st).lt(ed).timeZone("GMT+8")));
+        searchSourceBuilder.sort("absTime",SortOrder.ASC);
+        List<SearchHit> list = searchAll(getClient(),searchSourceBuilder,indices);
+        if (CollectionUtils.isEmpty(list)){
+            return null;
+        }
+        return list.stream().map(o->JSON.parseObject(o.getSourceAsString(),clazz)).collect(Collectors.toList());
+    }
+
+    private List<SearchHit> searchAll(RestHighLevelClient client, SearchSourceBuilder searchSourceBuilder, String[] indices) throws IOException {
+        TimeValue scrollTime = TimeValue.timeValueMinutes(1l);
+        int batchSize = 5000;
+        searchSourceBuilder.size(batchSize);
+        SearchRequest searchRequest = new SearchRequest(indices);
+        searchRequest.source(searchSourceBuilder);
+        searchRequest.scroll(scrollTime);
+        searchRequest.indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
+        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+
+        // 滚动查询
+        String scrollId = searchResponse.getScrollId();
+        ArrayList<SearchHit> searchHits = new ArrayList<>();
+        try {
+            while (searchResponse.getHits() != null && searchResponse.getHits().getHits().length > 0){
+                searchHits.addAll(Arrays.asList(searchResponse.getHits().getHits()));
+                //下一页
+                SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId);
+                scrollRequest.scroll(scrollId);
+                searchResponse = client.scroll(scrollRequest, RequestOptions.DEFAULT);
+                scrollId =  searchResponse.getScrollId();
+            }
+        }finally {
+            ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
+            clearScrollRequest.addScrollId(scrollId);
+            client.clearScroll(clearScrollRequest,RequestOptions.DEFAULT);
+        }
+        return searchHits;
+    }
+
 
     private JSONObject dealJson(JSONObject data, String fields) {
         if (data != null && StringUtils.isNotBlank(fields)){
