@@ -247,6 +247,30 @@ public class ElasticsearchUtils {
         return list.stream().map(o->JSON.parseObject(o.getSourceAsString(),clazz)).collect(Collectors.toList());
     }
 
+    private <T> List<T> queryEsData(String [] index,Class<T> clazz,String st, String ed,Set<String> indexList) throws IOException {
+        // 若索引不存在直接返回
+        int notExitsCount = 0;
+        for (String s : index) {
+          s = s.replace("*","");
+          if (!indexList.contains(s)){
+              notExitsCount++;
+          }
+        }
+
+        if (notExitsCount == index.length){
+            return null;
+        }
+
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(QueryBuilders.boolQuery().must(QueryBuilders.rangeQuery("absTime").gte(st).lt(ed).timeZone("GMT+8")));
+        searchSourceBuilder.sort("absTime",SortOrder.ASC);
+        List<SearchHit> searchHits = searchAll(client, searchSourceBuilder, index);
+        if (CollectionUtils.isEmpty(searchHits)){
+            return null;
+        }
+        return searchHits.stream().map(o->JSON.parseObject(o.getSourceAsString(),clazz)).collect(Collectors.toList());
+    }
+
     private List<SearchHit> searchAll(RestHighLevelClient client, SearchSourceBuilder searchSourceBuilder, String[] indices) throws IOException {
         TimeValue scrollTime = TimeValue.timeValueMinutes(1l);
         int batchSize = 5000;
@@ -276,6 +300,37 @@ public class ElasticsearchUtils {
         }
         return searchHits;
     }
+
+    private List<SearchHit> searchAll(SearchSourceBuilder searchSourceBuilder,RestHighLevelClient client,String [] indices) throws IOException {
+        // 设置时间
+        TimeValue timeValue = TimeValue.timeValueMinutes(1l);
+        int batchSize = 500;
+        searchSourceBuilder.size(batchSize);
+        SearchRequest searchRequest = new SearchRequest(indices);
+        searchRequest.scroll(timeValue);
+        searchRequest.indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
+        SearchResponse search = client.search(searchRequest, RequestOptions.DEFAULT);
+
+        List<SearchHit> searchHits = new ArrayList<>();
+        String scrollId = search.getScrollId();
+        try {
+            while (search.getHits() != null && search.getHits().getHits().length > 0){
+                searchHits.addAll(Arrays.asList(search.getHits().getHits()));
+
+                SearchScrollRequest searchScrollRequest = new SearchScrollRequest(scrollId);
+                searchScrollRequest.scroll(scrollId);
+                search = client.scroll(searchScrollRequest, RequestOptions.DEFAULT);
+                scrollId = search.getScrollId();
+            }
+        }finally {
+            ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
+            clearScrollRequest.addScrollId(scrollId);
+            client.clearScroll(clearScrollRequest,RequestOptions.DEFAULT);
+        }
+        return searchHits;
+    }
+
+
 
 
     private JSONObject dealJson(JSONObject data, String fields) {
