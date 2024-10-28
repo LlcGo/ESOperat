@@ -207,6 +207,7 @@ public class ElasticsearchUtils {
         boolean mulit = false;
         if (index.contains(",") || index.contains("*")){
             mulit = true;
+
         }
         List<JSONObject> sourceList = new ArrayList<>();
         for (SearchHit searchHit : searchResponse.getHits().getHits()) {
